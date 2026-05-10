@@ -786,8 +786,7 @@ function WordUI({ highlightStyleThumb, appliedStyles={}, selectedLine, doc, show
     const isHero=t.id===heroStyle;
     const isHighlight=highlightStyleThumb===t.id;
     const baseClass=`style-thumb ${t.kind}-thumb ${isHero?'hero':''} ${isHighlight?'highlight':''}`;
-    if (t.id==='title') return <div key={t.id} className={baseClass} data-thumb-id="title"><div className="style-preview-title">Title</div><div className="style-name">Title</div></div>;
-    if (t.id==='h1') return <div key={t.id} className={baseClass} data-thumb-id="h1"><div className="style-preview">AaBbCc<br/>Heading 1</div></div>;
+    if (t.id === 'h1') return <div key={t.id} className={baseClass} data-thumb-id="h1"><div className="style-preview" style={{color: currentLevelId === 4 ? '#BF80FF' : 'var(--word-blue)'}}>AaBbCcr<br/>Heading 1</div></div>;    if (t.id==='h1') return <div key={t.id} className={baseClass} data-thumb-id="h1"><div className="style-preview">AaBbCc<br/>Heading 1</div></div>;
     if (t.id==='h2') return <div key={t.id} className={baseClass} data-thumb-id="h2"><div className="style-preview">AaBbCcD<br/>Heading 2</div></div>;
     if (t.id==='normal') return <div key={t.id} className={baseClass} data-thumb-id="normal"><div className="style-preview">AaBbCcDdE<br/>Normal</div></div>;
     if (t.id==='nospacing') return <div key={t.id} className={baseClass} data-thumb-id="nospacing"><div className="style-preview">AaBbCcDdE<br/>No Spacing</div></div>;
