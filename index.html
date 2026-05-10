@@ -396,6 +396,48 @@
       }
   }
   
+
+  /* FORCE IMMEDIATE MOBILE ADAPTATION ON PAGE TRANSITIONS */
+  /* Ensures containers adapt to viewport immediately */
+  * { box-sizing: border-box; }
+  html, body { width: 100%; height: auto; }
+
+  /* Force all major containers to respect device width */
+  .app, .card, .phase-tabs, .quiz, .comparison-grid, .quiz-options {
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: hidden !important;
+  }
+
+  /* Ensure header adapts on mobile */
+  .header {
+      width: 100% !important;
+      max-width: 100% !important;
+  }
+
+  /* Mobile-first responsive padding */
+  @media (max-width: 480px) {
+      .app { padding: 8px !important; }
+      .card { padding: 16px !important; margin-bottom: 12px !important; }
+      .header { padding: 8px 12px !important; }
+      .brand-logo { width: 36px !important; height: 36px !important; font-size: 16px !important; }
+      .brand-name { font-size: 13px !important; }
+      .stats { gap: 8px !important; }
+      .stat { padding: 4px 8px !important; }
+      .phase-tabs { gap: 4px !important; padding: 4px !important; }
+      .phase-tab { padding: 8px !important; font-size: 12px !important; }
+      .word-app { border-radius: 4px !important; }
+      .word-ribbon { min-height: 76px !important; padding: 4px !important; }
+      .quiz-options { flex-direction: column !important; gap: 8px !important; }
+      .quiz-opt { width: 100% !important; }
+      .comparison-grid { grid-template-columns: 1fr !important; gap: 8px !important; width: 100% !important; }
+      .word-page { padding: 16px 18px !important; }
+  }
+
+  /* Force recalculation on transitions */
+  body { transition: none !important; }
+  .card, .phase-tabs, .quiz-options { transition: none !important; }
+  
 </style>
 </head>
 <body>
