@@ -665,7 +665,7 @@ function SeePhase({ level, muted, setMuted, onContinue }) {
   const [playing, setPlaying] = useState2(false);
   const [showCursor, setShowCursor] = useState2(false);
   const wordRootRef = useRef2(null);
-  const synthRef = useRef2(typeof window !== 'undefined' ? window.speechSynthesis : null);
+  const synthRef = useRef2(typeof window !== 'undefined' ? window.speechSynthesis : null); useEffect2(()=>{ const el=wordRootRef.current; if(!el) return; const scale=()=>{ if(window.innerWidth<600){ const sw=el.scrollWidth||700; const ratio=(window.innerWidth-16)/sw; if(ratio<0.99){ el.style.transform='scale('+ratio+')'; el.style.transformOrigin='top left'; el.style.marginBottom=((el.scrollHeight*ratio)-el.scrollHeight)+'px'; } }else{ el.style.transform=''; el.style.marginBottom=''; } }; scale(); window.addEventListener('resize',scale); return ()=>window.removeEventListener('resize',scale); },[step,playing]) window !== 'undefined' ? window.speechSynthesis : null);
   const voiceRef = useRef2(null);
   const cancelRef = useRef2(false);
 
