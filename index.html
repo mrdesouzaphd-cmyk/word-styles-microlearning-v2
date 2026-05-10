@@ -291,6 +291,111 @@
           .word-doc-area { padding: 10px; min-height: 280px; }
     }
   .final-q-counter { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* RESPONSIVE VIDEO & DEMO CONTENT */
+  /* Video container wrapper for responsive iframes and video demos */
+  .video-container, .demo-video, .video-wrapper, .responsive-video {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      height: 0;
+      overflow: hidden;
+  }
+  .video-container iframe, .video-container video, .demo-video iframe, .demo-video video, .video-wrapper iframe, .video-wrapper video, .responsive-video iframe, .responsive-video video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+  }
+
+  /* Ensure all iframes scale properly */
+  iframe[src*="youtube"], iframe[src*="vimeo"], .video-demo iframe {
+      max-width: 100%;
+      height: auto;
+  }
+
+  /* Video element responsive styling */
+  video {
+      max-width: 100%;
+      height: auto;
+      display: block;
+  }
+
+  /* Mobile video optimization (480px and below) */
+  @media (max-width: 480px) {
+      .video-container, .demo-video, .video-wrapper, .responsive-video {
+            padding-bottom: 56.25%;
+            width: 100%;
+      }
+
+      video {
+            width: 100%;
+            height: auto;
+      }
+
+      iframe[src*="youtube"], iframe[src*="vimeo"] {
+            width: 100%;
+            max-width: 100%;
+      }
+
+      /* Demo content wrapper */
+      .demo-wrapper {
+            width: 100%;
+            max-width: 100%;
+      }
+
+      /* Video comparison containers */
+      .video-comparison, .video-grid, .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            width: 100%;
+      }
+
+      /* Ensure videos in grids scale */
+      .video-comparison .video-item, .video-grid .video-item, .demo-grid .demo-item {
+            width: 100%;
+            overflow: hidden;
+      }
+  }
+
+  /* Tablet video optimization (481px - 768px) */
+  @media (min-width: 481px) and (max-width: 768px) {
+      .video-container, .demo-video, .video-wrapper, .responsive-video {
+            padding-bottom: 56.25%;
+            width: 100%;
+      }
+
+      /* Two-column layout for tablets where appropriate */
+      .video-comparison, .video-grid, .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+      }
+
+      video {
+            max-width: 100%;
+            height: auto;
+      }
+  }
+
+  /* Desktop optimization (769px and above) */
+  @media (min-width: 769px) {
+      .video-container, .demo-video, .video-wrapper, .responsive-video {
+            padding-bottom: 56.25%;
+      }
+
+      /* Allow larger layouts on desktop */
+      .video-comparison, .video-grid, .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+      }
+  }
+  
 </style>
 </head>
 <body>
