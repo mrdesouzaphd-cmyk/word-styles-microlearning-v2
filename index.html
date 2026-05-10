@@ -241,6 +241,55 @@
   .fireworks { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1000; }
   .level-complete-banner { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); background: linear-gradient(135deg, var(--teal), var(--purple), var(--magenta)); color: white; padding: 28px 56px; border-radius: 20px; font-size: 28px; font-weight: 800; box-shadow: 0 20px 60px rgba(233,30,126,0.6); z-index: 1001; animation: bannerPop 2.4s ease-out forwards; text-align: center; }
   @keyframes bannerPop { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 20% { transform: translate(-50%, -50%) scale(1.18); opacity: 1; } 30% { transform: translate(-50%, -50%) scale(1); } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.08); opacity: 0; } }
+    /* RESPONSIVE DESIGN FOR MOBILE & TABLET */
+    @media (max-width: 768px) {
+          .app { padding: 12px; }
+          .header { flex-direction: column; gap: 12px; padding: 10px; }
+          .brand { gap: 10px; }
+          .brand-logo { width: 38px; height: 38px; font-size: 16px; }
+          .brand-name { font-size: 14px; }
+          .stats { gap: 8px; flex-wrap: wrap; }
+          .stat { padding: 4px 8px; }
+          .stat-val { font-size: 15px; }
+          .stat-label { font-size: 9px; }
+          .card { padding: 18px; margin-bottom: 12px; }
+          .phase-tabs { gap: 4px; padding: 4px; }
+          .phase-tab { padding: 10px 8px; font-size: 12px; }
+          .compare-grid { grid-template-columns: 1fr; gap: 0; }
+          .compare-divider { display: none; }
+          .compare-mobile-arrow { display: flex; padding: 8px 0; }
+          .compare-panel { border-radius: 10px; margin-bottom: 12px; }
+          .quiz-opt { padding: 11px 13px; font-size: 14px; }
+          .quiz-q { font-size: 15px; margin-bottom: 12px; }
+          .btn { padding: 12px 24px; font-size: 14px; border-radius: 10px; }
+          .narration-line { font-size: 13px; padding: 10px 12px; min-height: 20px; }
+          .word-app { border-radius: 6px; }
+          .word-page { padding: 20px 24px; }
+          .doc-line { font-size: 10pt; margin-bottom: 6px; }
+    }
+    @media (max-width: 480px) {
+          .app { padding: 8px; }
+          .header { padding: 8px; }
+          .brand-logo { width: 32px; height: 32px; font-size: 14px; }
+          .brand-name { font-size: 12px; }
+          .brand-tag { font-size: 10px; }
+          .stats { gap: 4px; }
+          .stat { padding: 3px 6px; }
+          .stat-val { font-size: 13px; }
+          .card { padding: 12px; margin-bottom: 10px; border-radius: 12px; }
+          .phase-tabs { gap: 2px; padding: 3px; margin-bottom: 12px; }
+          .phase-tab { padding: 8px 6px; font-size: 11px; }
+          .quiz-q { font-size: 14px; margin-bottom: 10px; }
+          .quiz-opt { padding: 9px 11px; font-size: 13px; margin-bottom: 6px; }
+          .btn { padding: 10px 18px; font-size: 13px; border-radius: 8px; }
+          .narration-line { font-size: 12px; padding: 8px 10px; }
+          .anim-controls { flex-direction: column; gap: 8px; padding: 10px; }
+          .anim-buttons { flex-wrap: wrap; }
+          .anim-btn { font-size: 11px; padding: 7px 10px; }
+          .word-page { padding: 16px 18px; }
+          .doc-line { font-size: 9pt; margin-bottom: 5px; }
+          .word-doc-area { padding: 10px; min-height: 280px; }
+    }
   .final-q-counter { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
 </style>
 </head>
