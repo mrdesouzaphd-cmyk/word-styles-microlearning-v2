@@ -765,7 +765,7 @@ function SeePhase({ level, muted, setMuted, onContinue }) {
         </div>
       </div>
       <div style={{position:'relative'}}>
-        <WordUI highlightStyleThumb={highlightStyleThumb} appliedStyles={appliedStyles} selectedLine={selectedLine} doc={DOC_LINES} showCursor={showCursor} cursorPos={cursorPos} cursorClass={cursorClass} wordRootRef={wordRootRef} />
+        <WordUI highlightStyleThumb={highlightStyleThumb} appliedStyles={appliedStyles} selectedLine={selectedLine} doc={DOC_LINES} showCursor={showCursor} compact={window.innerWidth<600} cursorPos={cursorPos} cursorClass={cursorClass} wordRootRef={wordRootRef} />
       </div>
       <div className="nav-row">
         <span style={{color:'var(--muted)',fontSize:'13px'}}>Watch the demo, then continue</span>
@@ -935,7 +935,7 @@ function WordUI({ highlightStyleThumb, appliedStyles={}, selectedLine, doc, show
           </div>
           <div className="ribbon-group-label">Paragraph</div>
         </div>
-        <div className="ribbon-group" style={{flex:1,minWidth:'480px'}}>
+        <div className="ribbon-group" style={{flex:1,minWidth:'0'}}>
           <div className="ribbon-group-content">
             <div className="styles-gallery">
               {galleryThumbs.map(renderThumb)}
