@@ -245,199 +245,98 @@
     @media (max-width: 768px) {
           .app { padding: 12px; }
           .header { flex-direction: column; gap: 12px; padding: 10px; }
-          .brand { gap: 10px; }
-          .brand-logo { width: 38px; height: 38px; font-size: 16px; }
-          .brand-name { font-size: 14px; }
-          .stats { gap: 8px; flex-wrap: wrap; }
-          .stat { padding: 4px 8px; }
+          /* ===== UNIFIED MOBILE-FIRST RESPONSIVE DESIGN ===== */
+      /* Base: ensure nothing overflows on any screen */
+      *, *::before, *::after { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body { overflow-x: hidden; width: 100%; }
+      img, video, iframe, canvas { max-width: 100%; height: auto; display: block; }
+
+      /* Make Word app scroll horizontally on small screens instead of breaking */
+      .word-app { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .word-titlebar { min-width: 0; }
+      .word-search { display: none; }
+      .word-comments, .word-share { display: none; }
+
+      /* === TABLET (768px and below) === */
+      @media (max-width: 768px) {
+          .app { padding: 10px; max-width: 100%; }
+          .header { flex-direction: column; gap: 10px; padding: 10px 14px; }
+          .brand-logo { width: 36px; height: 36px; font-size: 15px; }
+          .brand-name { font-size: 13px; }
+          .stats { gap: 8px; flex-wrap: wrap; justify-content: center; }
+          .stat { padding: 4px 10px; }
           .stat-val { font-size: 15px; }
           .stat-label { font-size: 9px; }
-          .card { padding: 18px; margin-bottom: 12px; }
+          .card { padding: 16px; margin-bottom: 12px; border-radius: 12px; }
+          .welcome h1 { font-size: 26px; }
+          .welcome p.lead { font-size: 14px; }
+          .welcome { padding: 20px 12px; }
           .phase-tabs { gap: 4px; padding: 4px; }
-          .phase-tab { padding: 10px 8px; font-size: 12px; }
-          .compare-grid { grid-template-columns: 1fr; gap: 0; }
+          .phase-tab { padding: 10px 6px; font-size: 12px; gap: 5px; }
+          .compare-grid, .comparison-grid { grid-template-columns: 1fr; gap: 10px; }
           .compare-divider { display: none; }
-          .compare-mobile-arrow { display: flex; padding: 8px 0; }
-          .compare-panel { border-radius: 10px; margin-bottom: 12px; }
+          .compare-mobile-arrow { display: flex; padding: 6px 0; }
+          .compare-panel { border-radius: 10px; padding: 12px; margin-bottom: 10px; }
           .quiz-opt { padding: 11px 13px; font-size: 14px; }
           .quiz-q { font-size: 15px; margin-bottom: 12px; }
           .btn { padding: 12px 24px; font-size: 14px; border-radius: 10px; }
           .narration-line { font-size: 13px; padding: 10px 12px; min-height: 20px; }
           .word-app { border-radius: 6px; }
-          .word-page { padding: 20px 24px; }
-          .doc-line { font-size: 10pt; margin-bottom: 6px; }
-    }
-    @media (max-width: 480px) {
+          .word-page { padding: 20px 22px; }
+          .word-doc-area { padding: 12px; min-height: 280px; }
+          .doc-line { font-size: 10pt; margin-bottom: 5px; }
+      }
+
+      /* === MOBILE (480px and below) === */
+      @media (max-width: 480px) {
           .app { padding: 8px; }
-          .header { padding: 8px; }
-          .brand-logo { width: 32px; height: 32px; font-size: 14px; }
+          .header { padding: 8px 10px; gap: 8px; border-radius: 10px; }
+          .brand-logo { width: 30px; height: 30px; font-size: 13px; border-radius: 8px; }
           .brand-name { font-size: 12px; }
           .brand-tag { font-size: 10px; }
-          .stats { gap: 4px; }
-          .stat { padding: 3px 6px; }
-          .stat-val { font-size: 13px; }
-          .card { padding: 12px; margin-bottom: 10px; border-radius: 12px; }
-          .phase-tabs { gap: 2px; padding: 3px; margin-bottom: 12px; }
-          .phase-tab { padding: 8px 6px; font-size: 11px; }
+          .stats { gap: 6px; }
+          .stat { padding: 3px 7px; border-radius: 8px; }
+          .stat-val { font-size: 14px; }
+          .stat-label { font-size: 8px; }
+          .card { padding: 12px; margin-bottom: 10px; border-radius: 10px; }
+          .welcome h1 { font-size: 22px; }
+          .welcome p.lead { font-size: 13px; }
+          .welcome .scenario { padding: 14px; margin: 14px auto; }
+          .welcome .scenario p { font-size: 13px; }
+          .welcome { padding: 14px 8px; }
+          .phase-tabs { gap: 3px; padding: 3px; margin-bottom: 12px; }
+          .phase-tab { padding: 8px 4px; font-size: 11px; gap: 4px; border-radius: 6px; }
+          .phase-tab .dot { width: 6px; height: 6px; }
+          .compare-grid, .comparison-grid { grid-template-columns: 1fr !important; width: 100%; gap: 8px; }
+          .quiz-opt { padding: 9px 11px; font-size: 13px; margin-bottom: 6px; border-radius: 8px; }
+          .quiz-options { gap: 6px; }
           .quiz-q { font-size: 14px; margin-bottom: 10px; }
-          .quiz-opt { padding: 9px 11px; font-size: 13px; margin-bottom: 6px; }
-          .btn { padding: 10px 18px; font-size: 13px; border-radius: 8px; }
+          .quiz-feedback { font-size: 13px; padding: 10px 14px; border-radius: 10px; }
+          .btn { padding: 10px 20px; font-size: 13px; border-radius: 8px; width: 100%; text-align: center; }
+          .btn.secondary { width: auto; }
           .narration-line { font-size: 12px; padding: 8px 10px; }
           .anim-controls { flex-direction: column; gap: 8px; padding: 10px; }
-          .anim-buttons { flex-wrap: wrap; }
+          .anim-buttons { flex-wrap: wrap; gap: 6px; justify-content: center; }
           .anim-btn { font-size: 11px; padding: 7px 10px; }
-          .word-page { padding: 16px 18px; }
-          .doc-line { font-size: 9pt; margin-bottom: 5px; }
-          .word-doc-area { padding: 10px; min-height: 280px; }
-    }
-  .final-q-counter { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
-
-  /* RESPONSIVE VIDEO & DEMO CONTENT */
-  /* Video container wrapper for responsive iframes and video demos */
-  .video-container, .demo-video, .video-wrapper, .responsive-video {
-      position: relative;
-      width: 100%;
-      padding-bottom: 56.25%; /* 16:9 aspect ratio */
-      height: 0;
-      overflow: hidden;
-  }
-  .video-container iframe, .video-container video, .demo-video iframe, .demo-video video, .video-wrapper iframe, .video-wrapper video, .responsive-video iframe, .responsive-video video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-  }
-
-  /* Ensure all iframes scale properly */
-  iframe[src*="youtube"], iframe[src*="vimeo"], .video-demo iframe {
-      max-width: 100%;
-      height: auto;
-  }
-
-  /* Video element responsive styling */
-  video {
-      max-width: 100%;
-      height: auto;
-      display: block;
-  }
-
-  /* Mobile video optimization (480px and below) */
-  @media (max-width: 480px) {
-      .video-container, .demo-video, .video-wrapper, .responsive-video {
-            padding-bottom: 56.25%;
-            width: 100%;
+          .word-app { border-radius: 4px; font-size: 10px; }
+          .word-titlebar { padding: 4px 6px; font-size: 9px; }
+          .word-menubar { gap: 8px; font-size: 10px; padding: 2px 6px; }
+          .word-ribbon { min-height: 68px; padding: 3px 4px; }
+          .ribbon-group { padding: 0 3px; }
+          .word-doc-area { padding: 8px; min-height: 240px; }
+          .word-page { padding: 14px 16px; }
+          .doc-line { font-size: 9pt !important; margin-bottom: 4px; }
+          .doc-line.style-title { font-size: 18pt !important; }
+          .doc-line.style-h1, .doc-line.style-h1-purple { font-size: 13pt !important; }
+          .doc-line.style-h2 { font-size: 11pt !important; }
+          .nav-row { flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+          .powerups { gap: 6px; margin-bottom: 12px; }
+          .pu-btn { font-size: 11px; padding: 5px 10px; }
+          .cert-wrap { padding: 16px; }
+          .cert-canvas-wrap { margin: 10px 0; }
+          .cert-buttons { gap: 8px; flex-wrap: wrap; }
       }
-
-      video {
-            width: 100%;
-            height: auto;
-      }
-
-      iframe[src*="youtube"], iframe[src*="vimeo"] {
-            width: 100%;
-            max-width: 100%;
-      }
-
-      /* Demo content wrapper */
-      .demo-wrapper {
-            width: 100%;
-            max-width: 100%;
-      }
-
-      /* Video comparison containers */
-      .video-comparison, .video-grid, .demo-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            width: 100%;
-      }
-
-      /* Ensure videos in grids scale */
-      .video-comparison .video-item, .video-grid .video-item, .demo-grid .demo-item {
-            width: 100%;
-            overflow: hidden;
-      }
-  }
-
-  /* Tablet video optimization (481px - 768px) */
-  @media (min-width: 481px) and (max-width: 768px) {
-      .video-container, .demo-video, .video-wrapper, .responsive-video {
-            padding-bottom: 56.25%;
-            width: 100%;
-      }
-
-      /* Two-column layout for tablets where appropriate */
-      .video-comparison, .video-grid, .demo-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            width: 100%;
-      }
-
-      video {
-            max-width: 100%;
-            height: auto;
-      }
-  }
-
-  /* Desktop optimization (769px and above) */
-  @media (min-width: 769px) {
-      .video-container, .demo-video, .video-wrapper, .responsive-video {
-            padding-bottom: 56.25%;
-      }
-
-      /* Allow larger layouts on desktop */
-      .video-comparison, .video-grid, .demo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-      }
-  }
-  
-
-  /* FORCE IMMEDIATE MOBILE ADAPTATION ON PAGE TRANSITIONS */
-  /* Ensures containers adapt to viewport immediately */
-  * { box-sizing: border-box; }
-  html, body { width: 100%; height: auto; }
-
-  /* Force all major containers to respect device width */
-  .app, .card, .phase-tabs, .quiz, .comparison-grid, .quiz-options {
-      width: 100% !important;
-      max-width: 100% !important;
-      overflow-x: hidden !important;
-  }
-
-  /* Ensure header adapts on mobile */
-  .header {
-      width: 100% !important;
-      max-width: 100% !important;
-  }
-
-  /* Mobile-first responsive padding */
-  @media (max-width: 480px) {
-      .app { padding: 8px !important; }
-      .card { padding: 16px !important; margin-bottom: 12px !important; }
-      .header { padding: 8px 12px !important; }
-      .brand-logo { width: 36px !important; height: 36px !important; font-size: 16px !important; }
-      .brand-name { font-size: 13px !important; }
-      .stats { gap: 8px !important; }
-      .stat { padding: 4px 8px !important; }
-      .phase-tabs { gap: 4px !important; padding: 4px !important; }
-      .phase-tab { padding: 8px !important; font-size: 12px !important; }
-      .word-app { border-radius: 4px !important; }
-      .word-ribbon { min-height: 76px !important; padding: 4px !important; }
-      .quiz-options { flex-direction: column !important; gap: 8px !important; }
-      .quiz-opt { width: 100% !important; }
-      .comparison-grid { grid-template-columns: 1fr !important; gap: 8px !important; width: 100% !important; }
-      .word-page { padding: 16px 18px !important; }
-  }
-
-  /* Force recalculation on transitions */
-  body { transition: none !important; }
-  .card, .phase-tabs, .quiz-options { transition: none !important; }
-  
 </style>
 </head>
 <body>
