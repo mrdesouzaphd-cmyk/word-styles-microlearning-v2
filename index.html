@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Word Styles Microlearning — Morgan Lewis Technology Instructor Demo (v4)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --teal: #00CED1;
+    --purple: #6B2D8B;
+    --magenta: #E91E7E;
+    --word-blue: #2b579a;
+    --ribbon: #f3f3f3;
+    --ribbon-border: #d4d4d4;
+    --doc-bg: #ffffff;
+    --doc-text: #1a1a1a;
+    --selection: #b4d5fe;
+    --bg: #0a0a14;
+    --bg-2: #15152a;
+    --text: #f0f0f5;
+    --muted: #a0a0b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  #root { min-height: 100vh; }
+  .app { max-width: 1320px; margin: 0 auto; padding: 18px; }
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 22px;
+    background: rgba(30,30,56,0.6);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 18px;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-logo {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--teal), var(--purple), var(--magenta));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 18px; color: white;
+    box-shadow: 0 4px 20px rgba(233,30,126,0.4);
+  }
+  .brand-text { display: flex; flex-direction: column; }
+  .brand-name { font-weight: 700; font-size: 15px; letter-spacing: 0.3px; }
+  .brand-tag { font-size: 11px; color: var(--muted); }
+  .stats { display: flex; gap: 12px; align-items: center; }
+  .stat {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 6px 12px; border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .stat-val { font-weight: 800; font-size: 17px; }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-points { color: var(--teal); }
+  .stat-streak { color: var(--magenta); }
+  .stat-level { color: var(--purple); }
+  .progress-wrap { height: 8px; background: rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; margin-bottom: 18px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--purple), var(--magenta)); transition: width 0.6s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 12px rgba(233,30,126,0.6); }
+  .card { background: rgba(30,30,56,0.5); backdrop-filter: blur(10px); border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); padding: 26px; margin-bottom: 18px; }
+  .welcome { text-align: center; padding: 36px 24px; }
+  .welcome h1 { font-size: 36px; font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, var(--teal), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .welcome .scenario { background: rgba(43,87,154,0.15); border: 1px solid rgba(43,87,154,0.4); border-radius: 14px; padding: 20px; margin: 22px auto; max-width: 720px; text-align: left; }
+  .welcome .scenario h3 { color: var(--teal); margin-bottom: 10px; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; }
+  .welcome .scenario p { color: var(--text); line-height: 1.7; margin-bottom: 8px; }
+  .welcome .scenario strong { color: var(--magenta); }
+  .welcome p.lead { color: var(--muted); font-size: 16px; max-width: 720px; margin: 0 auto 22px; line-height: 1.6; }
+  .about-card { max-width: 720px; margin: 14px auto 0; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; overflow: hidden; text-align: left; }
+  .about-toggle { width: 100%; padding: 14px 20px; background: transparent; border: none; color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+  .about-toggle:hover { background: rgba(255,255,255,0.04); }
+  .about-chevron { color: var(--teal); font-size: 12px; }
+  .about-body { padding: 4px 20px 18px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .about-section { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .about-section:last-child { border-bottom: none; }
+  .about-label { font-size: 11px; color: var(--teal); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; margin-bottom: 4px; }
+  .about-text { color: var(--text); font-size: 14px; line-height: 1.65; }
+  .about-text strong { color: var(--magenta); }
+  .btn { background: linear-gradient(135deg, var(--teal), var(--purple), var(--magenta)); color: white; border: none; padding: 14px 36px; font-size: 16px; font-weight: 700; border-radius: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 24px rgba(233,30,126,0.35); }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(233,30,126,0.55); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn.secondary { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); box-shadow: none; }
+  .btn.secondary:hover { background: rgba(255,255,255,0.12); box-shadow: none; }
+  .phase-tabs { display: flex; gap: 8px; margin-bottom: 18px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 6px; }
+  .phase-tab { flex: 1; padding: 12px; border: none; border-radius: 8px; background: transparent; color: var(--muted); font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .phase-tab.active { background: linear-gradient(135deg, var(--teal), var(--magenta)); color: white; box-shadow: 0 4px 16px rgba(233,30,126,0.3); }
+  .phase-tab .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+  .phase-tab.active .dot { background: white; }
+  .word-app { background: var(--doc-bg); border-radius: 8px; overflow: hidden; box-shadow: 0 8px 28px rgba(0,0,0,0.45); color: var(--doc-text); border: 1px solid rgba(255,255,255,0.08); font-family: -apple-system, 'Segoe UI', Tahoma, sans-serif; position: relative; }
+  .word-titlebar { background: var(--word-blue); color: white; padding: 5px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; gap: 12px; }
+  .word-titlebar-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .word-titlebar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .word-quick { display: flex; gap: 3px; }
+  .word-quick .qa-btn { width: 16px; height: 16px; border-radius: 2px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 9px; }
+  .word-autosave { display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.08); border-radius: 12px; padding: 1px 4px 1px 6px; font-size: 10px; }
+  .autosave-pill { display: flex; align-items: center; gap: 4px; font-weight: 500; }
+  .autosave-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+  .autosave-toggle { background: #4ade80; color: white; padding: 0px 5px; border-radius: 10px; font-size: 9px; letter-spacing: -1px; }
+  .word-title-text { font-weight: 500; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .word-search { flex: 1; max-width: 320px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 3px 10px; display: flex; align-items: center; gap: 6px; font-size: 10px; color: rgba(255,255,255,0.85); }
+  .word-comments, .word-share { font-size: 10px; padding: 3px 7px; border-radius: 3px; cursor: default; background: rgba(255,255,255,0.08); }
+  .word-window-controls { display: flex; gap: 1px; margin-left: 4px; }
+  .word-wc { width: 24px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+  .word-wc:hover { background: rgba(255,255,255,0.15); }
+  .word-wc.close:hover { background: #e81123; }
+  .word-styles-actions { background: var(--ribbon); border-bottom: 1px solid var(--ribbon-border); padding: 4px 14px; display: flex; gap: 18px; font-size: 11px; color: #333; }
+  .action-link { display: flex; align-items: center; gap: 5px; cursor: default; }
+  .action-link:hover { color: var(--word-blue); }
+  .action-icon { width: 16px; height: 16px; background: white; border: 1px solid #c0c0c0; border-radius: 2px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--word-blue); }
+  .style-thumb.extra-thumb { min-width: 60px; max-width: 72px; }
+  .style-thumb.extra-thumb .style-preview { font-size: 9px; }
+  .word-menubar { background: white; padding: 3px 10px; border-bottom: 1px solid var(--ribbon-border); display: flex; gap: 14px; font-size: 11px; color: #444; }
+  .word-menu { padding: 2px 5px; cursor: default; }
+  .word-menu.active { color: var(--word-blue); border-bottom: 2px solid var(--word-blue); font-weight: 600; }
+  .word-ribbon { background: var(--ribbon); border-bottom: 1px solid var(--ribbon-border); padding: 5px 6px; display: flex; gap: 0; min-height: 84px; overflow: hidden; }
+  .ribbon-group { display: flex; flex-direction: column; padding: 0 6px; border-right: 1px solid var(--ribbon-border); position: relative; }
+  .ribbon-group:last-child { border-right: none; }
+  .ribbon-group-content { flex: 1; display: flex; gap: 3px; align-items: center; }
+  .ribbon-group-label { font-size: 9px; color: #555; text-align: center; padding-top: 3px; padding-bottom: 1px; margin-top: auto; }
+  .ribbon-btn { background: transparent; border: 1px solid transparent; border-radius: 3px; padding: 3px 5px; cursor: default; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #333; min-width: 24px; }
+  .ribbon-btn:hover { background: #e8e8e8; border-color: #c0c0c0; }
+  .ribbon-btn.large { padding: 3px 6px; }
+  .ribbon-btn.large .icon { font-size: 18px; margin-bottom: 1px; }
+  .ribbon-btn .icon { font-size: 13px; }
+  .ribbon-btn.highlight { background: var(--selection) !important; border-color: var(--word-blue) !important; box-shadow: 0 0 0 2px rgba(43,87,154,0.3); }
+  .ribbon-btn.B { font-weight: 800; font-family: serif; font-size: 12px; }
+  .ribbon-btn.I { font-style: italic; font-family: serif; font-size: 12px; }
+  .ribbon-btn.U { text-decoration: underline; font-family: serif; font-size: 12px; }
+  .font-controls { display: flex; flex-direction: column; gap: 3px; padding: 3px 0; }
+  .font-row { display: flex; gap: 2px; align-items: center; }
+  .font-name { background: white; border: 1px solid #c0c0c0; padding: 1px 5px; font-size: 10px; min-width: 80px; display: flex; justify-content: space-between; align-items: center; }
+  .font-size { background: white; border: 1px solid #c0c0c0; padding: 1px 3px; font-size: 10px; min-width: 30px; display: flex; justify-content: space-between; align-items: center; }
+  .styles-gallery { display: flex; gap: 2px; padding: 2px 0; flex: 1; overflow: hidden; align-items: center; }
+  .styles-expand { display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; border: 1px solid #c0c0c0; border-radius: 2px; height: 54px; width: 16px; margin-left: 2px; flex-shrink: 0; }
+  .styles-expand .arrow { font-size: 8px; color: #555; line-height: 1; padding: 0; }
+  .style-thumb { background: white; border: 1px solid #c0c0c0; border-radius: 2px; padding: 5px 8px; min-width: 64px; max-width: 80px; display: flex; flex-direction: column; align-items: center; transition: all 0.15s; height: 54px; justify-content: center; }
+  .style-thumb.highlight { background: var(--selection) !important; border-color: var(--word-blue) !important; box-shadow: 0 0 0 2px rgba(43,87,154,0.3); }
+  .style-preview { font-size: 9px; line-height: 1; margin-bottom: 2px; text-align: center; }
+  .style-name { font-size: 8px; color: #333; }
+  .style-thumb.title-thumb.hero { min-width: 78px; max-width: 92px; flex-shrink: 0; background: white; border: 1.5px solid #aaa; padding: 4px 6px 3px; height: 56px; }
+  .style-thumb.title-thumb.hero .style-preview-title { font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 400; color: #1a1a1a; letter-spacing: -0.3px; line-height: 1; margin-bottom: 2px; }
+  .style-thumb.title-thumb.hero .style-name { font-size: 8px; color: #555; text-transform: none; margin-top: 1px; }
+  .style-thumb.title-thumb.hero.highlight { background: var(--selection) !important; border-color: var(--word-blue) !important; box-shadow: 0 0 0 2px rgba(43,87,154,0.4), 0 0 12px rgba(43,87,154,0.3); }
+  .style-thumb.title-thumb { flex-shrink: 0; }
+  .style-thumb.h1-thumb .style-preview { font-size: 11px; font-weight: 600; color: var(--word-blue); }
+  .style-thumb.h2-thumb .style-preview { font-size: 10px; font-weight: 600; color: var(--word-blue); }
+  .style-thumb.h3-thumb .style-preview { font-size: 9px; font-weight: 600; color: var(--word-blue); }
+  .style-thumb.normal-thumb .style-preview { font-size: 9px; }
+  .word-doc-area { background: #e6e6e6; padding: 18px; min-height: 380px; display: flex; justify-content: center; position: relative; }
+  .word-page { background: white; width: 100%; max-width: 540px; padding: 36px 44px; min-height: 360px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: relative; }
+  .word-page .doc-line { font-size: 11pt; color: #1a1a1a; font-weight: normal; font-family: 'Aptos', Calibri, sans-serif; transition: all 0.4s ease; margin-bottom: 8px; line-height: 1.4; }
+  .word-page .doc-line.style-title { font-size: 26pt; font-weight: 600; color: #1a1a1a; margin-bottom: 12px; line-height: 1.1; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+  .word-page .doc-line.style-h1 { font-size: 16pt; font-weight: 600; color: var(--word-blue); margin-top: 12px; margin-bottom: 8px; }
+  .word-page .doc-line.style-h2 { font-size: 13pt; font-weight: 600; color: var(--word-blue); margin-top: 10px; margin-bottom: 6px; }
+  .word-page .doc-line.style-h1-purple { font-size: 16pt; font-weight: 600; color: var(--purple); margin-top: 12px; margin-bottom: 8px; }
+  .word-page .doc-line.selected { background: var(--selection); }
+  .word-cursor { position: absolute; width: 28px; height: 28px; pointer-events: none; z-index: 200; transition: left 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), top 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); filter: drop-shadow(0 3px 8px rgba(233, 30, 126, 0.6)); }
+  .word-cursor svg { width: 100%; height: 100%; }
+  .word-cursor::after { content: ''; position: absolute; top: 50%; left: 50%; width: 36px; height: 36px; border: 2px solid rgba(233, 30, 126, 0.5); border-radius: 50%; transform: translate(-50%, -50%); animation: cursorPulse 1.5s ease-in-out infinite; pointer-events: none; }
+  @keyframes cursorPulse { 0%, 100% { transform: translate(-50%, -50%) scale(0.7); opacity: 0.8; } 50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.2; } }
+  .word-cursor.click::before { content: ''; position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; border: 3px solid var(--magenta); border-radius: 50%; transform: translate(-50%, -50%) scale(0); animation: clickPulse 0.6s ease-out; z-index: 201; }
+  @keyframes clickPulse { to { transform: translate(-50%, -50%) scale(2.2); opacity: 0; } }
+  .word-statusbar { background: var(--word-blue); color: white; padding: 3px 12px; font-size: 10px; display: flex; justify-content: space-between; }
+  .word-app.compact .word-ribbon { min-height: 80px; padding: 4px 5px; }
+  .word-app.compact .ribbon-group { padding: 0 5px; }
+  .word-app.compact .ribbon-group:first-child { min-width: 56px !important; }
+  .word-app.compact .word-doc-area { padding: 12px; min-height: 320px; }
+  .word-app.compact .word-page { padding: 24px 28px; max-width: none; min-height: 280px; }
+  .word-app.compact .word-page .doc-line { font-size: 10pt; margin-bottom: 5px; }
+  .word-app.compact .word-page .doc-line.style-title { font-size: 22pt; }
+  .word-app.compact .word-page .doc-line.style-h1 { font-size: 13pt; }
+  .word-app.compact .word-page .doc-line.style-h2 { font-size: 11pt; }
+  .word-app.compact .word-page .doc-line.style-h1-purple { font-size: 13pt; }
+  .concept-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 22px; align-items: start; }
+  @media (max-width: 900px) { .concept-grid { grid-template-columns: 1fr; } }
+  .concept-card h2 { font-size: 24px; margin-bottom: 12px; background: linear-gradient(135deg, var(--teal), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .concept-card p { color: var(--text); line-height: 1.7; margin-bottom: 12px; }
+  .concept-card .key-points { list-style: none; }
+  .concept-card .key-points li { padding: 9px 13px; margin-bottom: 7px; background: rgba(0,206,209,0.08); border-left: 3px solid var(--teal); border-radius: 6px; font-size: 13.5px; }
+  .anim-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding: 14px 18px; background: rgba(0,0,0,0.45); border-radius: 12px; flex-wrap: wrap; gap: 12px; border: 1px solid rgba(0,206,209,0.25); }
+  .anim-status { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); min-width: 90px; }
+  .anim-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--magenta); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+  .narration-line { color: white; font-size: 17px; font-weight: 600; flex: 1; text-align: center; padding: 12px 18px; min-height: 24px; background: linear-gradient(135deg, rgba(0,206,209,0.18), rgba(233,30,126,0.18)); border-radius: 10px; border: 1px solid rgba(0,206,209,0.4); box-shadow: 0 4px 16px rgba(0,206,209,0.15); line-height: 1.4; }
+  .anim-buttons { display: flex; gap: 8px; }
+  .anim-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 9px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; font-weight: 600; }
+  .anim-btn:hover { border-color: var(--magenta); }
+  .anim-btn.primary { background: linear-gradient(135deg, var(--teal), var(--magenta)); border: none; }
+  .anim-btn.muted { background: rgba(255,68,88,0.15); border-color: rgba(255,68,88,0.4); }
+  .compare-grid { display: grid; grid-template-columns: 1fr 24px 1fr; gap: 0; margin-bottom: 22px; align-items: stretch; }
+  .compare-divider { background: linear-gradient(180deg, transparent, rgba(0,206,209,0.4), transparent); width: 2px; margin: 0 auto; align-self: stretch; }
+  .compare-mobile-arrow { display: none; }
+  @media (max-width: 1024px) { .compare-grid { grid-template-columns: 1fr; gap: 0; } .compare-divider { display: none; } .compare-mobile-arrow { display: flex; justify-content: center; align-items: center; padding: 12px 0; font-size: 26px; color: var(--teal); animation: bounce 1.6s infinite; } @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } } }
+  .compare-panel { background: rgba(0,0,0,0.25); border-radius: 14px; padding: 0; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
+  .compare-panel.before { border-top: 4px solid #ff4458; }
+  .compare-panel.after { border-top: 4px solid var(--teal); }
+  .compare-label { text-align: center; font-weight: 800; font-size: 14px; padding: 10px; text-transform: uppercase; letter-spacing: 2px; }
+  .compare-label.before { background: rgba(255,68,88,0.22); color: #ff8b8b; border-bottom: 1px solid rgba(255,68,88,0.3); }
+  .compare-label.after { background: rgba(0,206,209,0.22); color: #66e8ea; border-bottom: 1px solid rgba(0,206,209,0.3); }
+  .compare-word-wrap { padding: 12px; }
+  .quiz { padding: 8px 0; }
+  .quiz-q { font-size: 17px; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+  .quiz-options { display: flex; flex-direction: column; gap: 9px; }
+  .quiz-opt { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: var(--text); padding: 13px 17px; border-radius: 10px; text-align: left; cursor: pointer; transition: all 0.2s; font-size: 14.5px; }
+  .quiz-opt:hover { background: rgba(0,206,209,0.1); border-color: var(--teal); }
+  .quiz-opt.selected { border-color: var(--purple); background: rgba(107,45,139,0.2); }
+  .quiz-opt.correct { border-color: var(--teal); background: rgba(0,206,209,0.2); }
+  .quiz-opt.wrong { border-color: #ff4458; background: rgba(255,68,88,0.15); }
+  .quiz-opt.disabled { cursor: not-allowed; opacity: 0.6; }
+  .quiz-feedback { margin-top: 16px; padding: 15px 19px; border-radius: 12px; font-size: 14px; line-height: 1.6; }
+  .quiz-feedback.correct { background: rgba(0,206,209,0.15); border-left: 3px solid var(--teal); }
+  .quiz-feedback.wrong { background: linear-gradient(135deg, rgba(255,193,7,0.08), rgba(233,30,126,0.08)); border-left: 3px solid #FFC107; }
+  .quiz-feedback .feedback-header { font-weight: 700; margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .quiz-feedback.correct .feedback-header { color: var(--teal); }
+  .quiz-feedback.wrong .feedback-header { color: #FFC107; }
+  .quiz-feedback .feedback-body { color: var(--text); }
+  .quiz-feedback .feedback-body strong { color: var(--magenta); }
+  .quiz-feedback .feedback-takeaway { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: var(--muted); font-style: italic; }
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; gap: 12px; flex-wrap: wrap; }
+  .powerups { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .pu-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: white; padding: 7px 13px; border-radius: 10px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .pu-btn:hover:not(:disabled) { border-color: var(--magenta); background: rgba(233,30,126,0.1); }
+  .pu-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .pu-count { background: var(--magenta); color: white; border-radius: 10px; padding: 1px 6px; font-size: 11px; font-weight: 700; }
+  .cert-wrap { text-align: center; padding: 20px; }
+  .cert-canvas-wrap { background: white; padding: 12px; border-radius: 12px; display: inline-block; margin: 18px 0; box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+  .cert-canvas-wrap canvas { display: block; max-width: 100%; height: auto; }
+  .cert-input { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 10px 14px; border-radius: 8px; font-size: 15px; width: 100%; max-width: 360px; margin-bottom: 14px; }
+  .cert-input::placeholder { color: var(--muted); }
+  .cert-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .fireworks { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1000; }
+  .level-complete-banner { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); background: linear-gradient(135deg, var(--teal), var(--purple), var(--magenta)); color: white; padding: 28px 56px; border-radius: 20px; font-size: 28px; font-weight: 800; box-shadow: 0 20px 60px rgba(233,30,126,0.6); z-index: 1001; animation: bannerPop 2.4s ease-out forwards; text-align: center; }
+  @keyframes bannerPop { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 20% { transform: translate(-50%, -50%) scale(1.18); opacity: 1; } 30% { transform: translate(-50%, -50%) scale(1); } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.08); opacity: 0; } }
+  .final-q-counter { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+const BRAND = { teal: '#00CED1', purple: '#6B2D8B', magenta: '#E91E7E', wordBlue: '#2b579a' };
+
+const DOC_LINES = [
+  { id: 'title', text: 'Document Review Summary' },
+  { id: 'sub', text: 'Q1 2026 Internal Review · Prepared for the Client Service Committee' },
+  { id: 'h1-bg', text: 'Background' },
+  { id: 'p-bg', text: "This summary captures themes from client feedback collected during Q1 2026 across the Firm's eight largest engagements. Eighteen clients participated, covering Corporate, Litigation, Tax, and Regulatory practice groups." },
+  { id: 'h1-themes', text: 'Key Themes' },
+  { id: 'p-themes', text: 'Three themes emerged consistently across the feedback. Each is described below.' },
+  { id: 'h2-resp', text: 'Responsiveness' },
+  { id: 'p-resp', text: 'Clients value timeliness above almost any other attribute. Even an acknowledgment reply the same business day rates higher than a substantive answer two days later.' },
+  { id: 'h2-clarity', text: 'Clarity' },
+  { id: 'p-clarity', text: 'Clients want our written work product to lead with the conclusion. Multiple respondents referenced the Smart Brevity model their general counsel teams have adopted.' },
+  { id: 'h2-cons', text: 'Consistency' },
+  { id: 'p-cons', text: 'Clients with cross-office matters noted variation in how documents are formatted, how communications are signed, and how status updates are structured.' },
+  { id: 'h1-next', text: 'Recommended Next Steps' },
+  { id: 'p-next', text: 'Three actions are recommended for Q2: adopt a Firmwide document template with consistent Heading Styles, pilot a same-day acknowledgment standard, and train fee-earners on Smart Brevity structure.' }
+];
+
+const LEVELS = [
+  {
+    id: 1, title: 'Apply the Title Style',
+    concept: 'Word Styles are pre-formatted bundles of formatting (font, size, color, spacing) that you apply with a single click. The Title style is the largest, most prominent style — used once per document for the main heading.',
+    keyPoints: ['Styles ensure visual consistency across long documents', "Title is reserved for the document's main heading", 'Click in the line, then click the style in the Styles gallery'],
+    targetLineId: 'title', targetStyle: 'style-title', highlightStyleThumb: 'title',
+    narr: ['Level one. Apply the Title style.','Click inside the main heading.','Line selected. Ready to style.','Move to the Styles gallery.','Click Title to apply the style.','Title applied. Clean, professional heading.'],
+    quiz: {
+      q: "You just opened a draft Document Review Summary. The main heading is plain 11-point Aptos. What's the fastest way to make it look like a proper document title?",
+      options: ['Highlight the text and manually change the font, size, and weight','Click in the line and apply the Title style from the Styles gallery','Add several blank lines above it to create visual separation','Bold the text and underline it'],
+      correct: 1,
+      explanation: "Applying the Title style is one click and ensures consistency. Manual formatting is slow and breaks the document's structural map.",
+      wrongFeedback: {
+        0: { lead: "That's a reasonable instinct — manual formatting feels precise.", body: "But it locks the change to one heading. The <strong>Title style</strong> applies the same formatting in one click and stays consistent if a partner asks you to change it later.", takeaway: "Styles save the most time on long documents and partner edits." },
+        2: { lead: "Whitespace does help readability — you're right to think about visual hierarchy.", body: "But blank lines don't make a heading <em>structural</em>. The <strong>Title style</strong> creates both the visual emphasis and the document outline that powers the Navigation Pane and TOC.", takeaway: "Visual ≠ structural. Styles give you both at once." },
+        3: { lead: "Bold and underline read as emphasis — a fair instinct.", body: "But that's character formatting, not a heading. The <strong>Title style</strong> bundles font, size, weight, and spacing in a single click, and it tells Word 'this is the document title.'", takeaway: "Use Styles for headings, character formatting for inline emphasis." }
+      }
+    },
+    final: { q: 'Why is Title preferred over manually formatting a heading?', options: ['It looks the same as manual formatting','It saves clicks but nothing else',"It's consistent, updateable, and machine-readable for navigation/TOC",'It only works in Word 365'], correct: 2 }
+  },
+  {
+    id: 2, title: 'Apply Heading 1 to Sections',
+    concept: 'Heading 1 marks the top-level sections of your document. Once applied, Heading 1 lines automatically appear in the Navigation Pane and become entries in a Table of Contents.',
+    keyPoints: ['Heading 1 = top-level sections (Background, Key Themes, Recommended Next Steps)',"Word's Navigation Pane uses these to build a clickable outline",'A Table of Contents pulls directly from Heading 1, 2, 3 styles'],
+    targetLineId: 'h1-bg', targetStyle: 'style-h1', highlightStyleThumb: 'h1',
+    narr: ['Level two. Apply Heading 1 to sections.','Click inside the line that says Background.','Cursor placed in the section heading.','Move to the Styles gallery now.','Click Heading 1 to apply it.','Heading 1 applied. Now part of the outline.'],
+    quiz: {
+      q: 'A partner asks you to add a Table of Contents to a 40-page brief. Which Word feature must already be in place for the TOC to populate?',
+      options: ['Page numbers in the footer','A cover page','Heading styles applied to section titles','A bibliography section'],
+      correct: 2,
+      explanation: "Word's automatic TOC reads heading styles directly. No headings, no TOC entries.",
+      wrongFeedback: {
+        0: { lead: "Page numbers feel important to a TOC — totally fair instinct.", body: "Word handles page numbers automatically inside the TOC. What it <em>can't</em> infer are the entries themselves. Those come from <strong>heading styles</strong>.", takeaway: "Page numbers populate; headings determine what gets listed." },
+        1: { lead: "A cover page is a nice touch on a polished brief.", body: "But it's purely visual. The TOC needs <strong>heading styles</strong> to know which lines are sections worth listing.", takeaway: "Cover pages frame the document; heading styles structure it." },
+        3: { lead: "A bibliography is a separate Word feature — close, but not the trigger here.", body: "Bibliographies are built from citations. The Table of Contents is built from <strong>heading styles</strong> applied to section titles.", takeaway: "Different reference features pull from different sources. TOC = headings." }
+      }
+    },
+    final: { q: 'Heading 1 is best used for:', options: ['The document title only','Top-level section names','Every line of body text','Bullet points'], correct: 1 }
+  },
+  {
+    id: 3, title: 'Apply Heading 2 for Subsections',
+    concept: 'Heading 2 sits one level below Heading 1. Use it for subsections inside a major section — for example, Responsiveness, Clarity, and Consistency under the Key Themes heading.',
+    keyPoints: ['Heading 2 nests inside Heading 1','Smaller and slightly less prominent than Heading 1','Critical for documents with hierarchical structure'],
+    targetLineId: 'h2-resp', targetStyle: 'style-h2', highlightStyleThumb: 'h2',
+    narr: ['Level three. Heading 2 for subsections.','Click inside Responsiveness, the first theme.','Cursor placed in the subsection.','Move to the Styles gallery.','Click Heading 2 to apply it.','Heading 2 applied. Smaller, still structural.'],
+    quiz: {
+      q: 'Inside Key Themes there are three subsections: Responsiveness, Clarity, Consistency. What style should they use?',
+      options: ['Title','Heading 1','Heading 2','Normal with bold'],
+      correct: 2,
+      explanation: 'Subsections inside a Heading 1 section take Heading 2. This produces a properly nested outline and TOC.',
+      wrongFeedback: {
+        0: { lead: "Title feels prominent, which is the right energy for subsections.", body: "But Title is reserved for the <em>one</em> main heading at the top. Each level down — sections and subsections — uses <strong>Heading 1</strong> and <strong>Heading 2</strong>.", takeaway: "Title once, Heading 1 for sections, Heading 2 for subsections." },
+        1: { lead: "Heading 1 is close — you're thinking structurally.", body: "But Key Themes is already Heading 1. The three themes underneath need to nest <em>inside</em> it as <strong>Heading 2</strong>, so the outline reflects the hierarchy.", takeaway: "Each level deeper = next heading number down." },
+        3: { lead: "Bold reads as emphasis, which makes sense visually.", body: "But bold isn't part of the outline. <strong>Heading 2</strong> gives the same visual emphasis <em>and</em> registers in the Navigation Pane and TOC.", takeaway: "Heading styles are bold-plus-structure. Pick the structural option." }
+      }
+    },
+    final: { q: 'Why use Heading 2 instead of just bolding the subsection name?', options: ['Bold looks worse','Heading 2 is part of the document outline; bold is just visual',"There's no difference",'Bold cannot be applied to headings'], correct: 1 }
+  },
+  {
+    id: 4, title: 'Modify a Style — Update for All',
+    concept: 'When you modify a Style, every paragraph using that style updates instantly. Change Heading 1 once, and every Heading 1 in the document changes — no find-and-replace, no manual reformatting.',
+    keyPoints: ['Modifying a style updates every instance in the document','Right-click a style → Modify','This is why styles save hours on long documents'],
+    targetLineId: 'h1-bg', targetStyle: 'style-h1-purple', highlightStyleThumb: 'h1',
+    narr: ['Level four. Modify the Heading 1 style.','Right-click the Heading 1 thumbnail.','Choose Modify from the menu.','Change color from blue to brand purple.','Confirm the change. Watch the document.','Every Heading 1 updated at once. Massive timesaver.'],
+    quiz: {
+      q: 'A partner asks: change every section heading from blue to firm purple. The document has 22 Heading 1 instances. What is the fastest path?',
+      options: ['Find-and-replace, manually changing color each time','Modify the Heading 1 style — every instance updates at once','Re-type each heading in the new color','Export to PDF and re-color in Acrobat'],
+      correct: 1,
+      explanation: "Modifying the style is one operation. Every instance updates. This is the single biggest reason senior attorneys prefer style-driven documents.",
+      wrongFeedback: {
+        0: { lead: "Find-and-replace is the right reflex for repetitive edits.", body: "But Word's find-and-replace works on text, not formatting in this context. <strong>Modifying the Heading 1 style</strong> updates color across all 22 instances in one click.", takeaway: "Style modification beats find-and-replace for global formatting changes." },
+        2: { lead: "Retyping ensures total control — you're being thorough.", body: "But it's 22 manual edits, with risk of inconsistency. <strong>Modifying the style</strong> is one click and guaranteed uniform.", takeaway: "Manual is precise; styles are precise <em>and</em> fast." },
+        3: { lead: "PDF post-processing is sometimes the right answer for final-stage changes.", body: "But this is a draft, and edits will keep coming. <strong>Modifying the Heading 1 style</strong> in Word means future drafts also stay consistent.", takeaway: "Fix it at the source, not after export." }
+      }
+    },
+    final: { q: 'When you modify a Style, what happens?', options: ['Only the selected text changes','Every instance using that style updates','Word asks you to confirm each change','The change is lost when you close the document'], correct: 1 }
+  },
+  {
+    id: 5, title: 'Generate the Table of Contents',
+    concept: "Because we've used Title, Heading 1, and Heading 2 styles, Word can now generate a fully clickable, page-numbered Table of Contents in two clicks. Update it any time the document changes.",
+    keyPoints: ['References tab → Table of Contents → choose a style','TOC reads directly from heading styles','Right-click → Update Field to refresh as the document grows'],
+    targetLineId: null, targetStyle: null, highlightStyleThumb: 'toc',
+    narr: ['Level five. Generate the Table of Contents.','Move to the References tab on the ribbon.','Click the Table of Contents button.','Choose a TOC style from the gallery.','Word builds the TOC from your headings.','TOC complete. Clickable, ready to update.'],
+    quiz: {
+      q: 'Three days before filing, the team adds two new sections to a 60-page brief. The TOC is now out of date. What do you do?',
+      options: ['Manually retype the new entries into the TOC','Right-click the TOC and choose Update Field','Delete and re-insert the TOC from scratch each time','Email the document to IT for help'],
+      correct: 1,
+      explanation: "Right-click → Update Field re-reads every heading and rebuilds the TOC in seconds. This is why style-driven structure pays off late in the drafting cycle.",
+      wrongFeedback: {
+        0: { lead: "Manual entry is what TOCs used to require — fair instinct.", body: "But Word's TOC is a <em>field</em>, not static text. <strong>Right-click → Update Field</strong> re-reads every heading style and rebuilds the entire TOC in seconds.", takeaway: "TOC is dynamic. Update Field is the magic command." },
+        2: { lead: "A clean rebuild feels safer when things look out of sync.", body: "But it costs you styling and any custom TOC settings. <strong>Update Field</strong> refreshes content while preserving your formatting choices.", takeaway: "Update beats rebuild for in-place changes." },
+        3: { lead: "IT escalation is sometimes the right move — but not for this.", body: "This is a 5-second fix you'll do dozens of times: <strong>right-click the TOC → Update Field</strong>. It's the most-used Word power-user shortcut on long documents.", takeaway: "This is yours to handle. Save IT for the truly broken." }
+      }
+    },
+    final: { q: "Word's automatic Table of Contents is built from:", options: ['Bold text','Heading styles applied to section titles','The first sentence of each paragraph','Manually typed entries'], correct: 1 }
+  }
+];
+
+const MALE_VOICES = ['Microsoft David','Microsoft Mark','Microsoft Guy','Daniel','Alex','Fred','Thomas','Albert','Bruce','Junior','Ralph','Aaron','Arthur','Gordon','Reed','Rishi','Xander'];
+const HARD_EXCLUDE = ['Female','female','Victoria','Samantha','Zira','Hazel','Susan','Karen','Moira','Fiona','Tessa','Veena','Yelena','Zosia'];
+
+function pickMaleVoice(voices) {
+  const safe = voices.filter(v => v.name && !HARD_EXCLUDE.some(bad => v.name.includes(bad)));
+  let v = null;
+  for (const name of MALE_VOICES) { v = safe.find(x => x.name && x.name.includes(name)); if (v) break; }
+  if (!v) v = safe.find(x => x.name && /male/i.test(x.name) && !/female/i.test(x.name));
+  if (!v) v = safe.find(x => x.lang && x.lang.startsWith('en'));
+  return v || null;
+}
+</script>
+<script type="text/babel">
+const { useState: useState2, useEffect: useEffect2, useRef: useRef2 } = React;
+
+function App() {
+  const [screen, setScreen] = useState2('welcome');
+  const [levelIdx, setLevelIdx] = useState2(0);
+  const [phase, setPhase] = useState2('learn');
+  const [points, setPoints] = useState2(0);
+  const [streak, setStreak] = useState2(0);
+  const [completedLevels, setCompletedLevels] = useState2([]);
+  const [muted, setMuted] = useState2(false);
+  const [powerUps, setPowerUps] = useState2({ fifty: 2, hint: 2, skip: 1 });
+  const [showLevelComplete, setShowLevelComplete] = useState2(false);
+  const [finalQIdx, setFinalQIdx] = useState2(0);
+  const [finalCorrect, setFinalCorrect] = useState2(0);
+  const [finalAnswered, setFinalAnswered] = useState2(null);
+  const [recipientName, setRecipientName] = useState2('Morgan Lewis Attendee');
+  const fwCanvasRef = useRef2(null);
+  const level = LEVELS[levelIdx];
+  const totalProgress = (completedLevels.length / LEVELS.length) * 100;
+
+  function launchFireworks() {
+    const canvas = fwCanvasRef.current;
+    if (!canvas) return;
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const colors = [BRAND.teal, BRAND.purple, BRAND.magenta, '#FFD700', '#FFFFFF'];
+    const emojis = ['💎','✨','⭐','🎉'];
+    function burst(x, y) {
+      for (let i = 0; i < 60; i++) {
+        const angle = (Math.PI * 2 * i) / 60;
+        const speed = 3 + Math.random() * 5;
+        particles.push({ x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, life: 1, color: colors[Math.floor(Math.random()*colors.length)], size: 2+Math.random()*3, isEmoji: Math.random()<0.15, emoji: emojis[Math.floor(Math.random()*emojis.length)] });
+      }
+    }
+    burst(canvas.width*0.3, canvas.height*0.4);
+    setTimeout(() => burst(canvas.width*0.7, canvas.height*0.4), 250);
+    setTimeout(() => burst(canvas.width*0.5, canvas.height*0.3), 500);
+    setTimeout(() => burst(canvas.width*0.5, canvas.height*0.6), 750);
+    let raf;
+    function animate() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for (let i = particles.length-1; i>=0; i--) {
+        const p = particles[i];
+        p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.vx*=0.99; p.life-=0.012;
+        if (p.life<=0) { particles.splice(i,1); continue; }
+        ctx.globalAlpha=p.life;
+        if (p.isEmoji) { ctx.font=`${p.size*6}px serif`; ctx.fillText(p.emoji,p.x,p.y); }
+        else { ctx.fillStyle=p.color; ctx.shadowBlur=12; ctx.shadowColor=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); }
+      }
+      ctx.shadowBlur=0; ctx.globalAlpha=1;
+      if (particles.length>0) raf=requestAnimationFrame(animate);
+      else ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+    animate();
+    return () => cancelAnimationFrame(raf);
+  }
+
+  function startLevel() { setScreen('level'); setLevelIdx(0); setPhase('learn'); }
+  function handleLevelComplete(earnedPoints) {
+    setPoints(p=>p+earnedPoints); setStreak(s=>s+1);
+    if (!completedLevels.includes(levelIdx)) setCompletedLevels(cl=>[...cl, levelIdx]);
+    setShowLevelComplete(true); launchFireworks();
+    setTimeout(()=>setShowLevelComplete(false), 2400);
+  }
+  function nextLevel() {
+    if (levelIdx < LEVELS.length-1) { setLevelIdx(levelIdx+1); setPhase('learn'); }
+    else { setScreen('finalQuiz'); setFinalQIdx(0); setFinalCorrect(0); setFinalAnswered(null); }
+  }
+
+  return (
+    <div className="app">
+      <canvas ref={fwCanvasRef} className="fireworks" />
+      {showLevelComplete && (
+        <div className="level-complete-banner">🎉 Level Complete! 🎉<div style={{fontSize:'15px',marginTop:'6px',opacity:0.95}}>+50 points · Streak {streak+1}</div></div>
+      )}
+      <Header points={points} streak={streak} levelIdx={levelIdx} totalLevels={LEVELS.length} screen={screen} muted={muted} setMuted={setMuted} />
+      <ProgressBar pct={screen==='certificate'?100:totalProgress} />
+      {screen==='welcome' && <Welcome onStart={startLevel} />}
+      {screen==='level' && level && (
+        <LevelView level={level} phase={phase} onPhaseChange={setPhase} onComplete={handleLevelComplete} onNext={nextLevel} muted={muted} setMuted={setMuted} powerUps={powerUps} setPowerUps={setPowerUps} levelIdx={levelIdx} totalLevels={LEVELS.length} />
+      )}
+      {screen==='finalQuiz' && (
+        <FinalQuiz qIdx={finalQIdx} setQIdx={setFinalQIdx} correct={finalCorrect} setCorrect={setFinalCorrect} answered={finalAnswered} setAnswered={setFinalAnswered} onComplete={()=>setScreen('certificate')} addPoints={(p)=>setPoints(prev=>prev+p)} />
+      )}
+      {screen==='certificate' && (
+        <Certificate points={points} finalCorrect={finalCorrect} recipientName={recipientName} setRecipientName={setRecipientName} onRestart={()=>{ setScreen('welcome'); setLevelIdx(0); setPhase('learn'); setPoints(0); setStreak(0); setCompletedLevels([]); setPowerUps({fifty:2,hint:2,skip:1}); setFinalQIdx(0); setFinalCorrect(0); setFinalAnswered(null); }} />
+      )}
+    </div>
+  );
+}
+
+function Header({ points, streak, levelIdx, totalLevels, screen, muted, setMuted }) {
+  return (
+    <div className="header">
+      <div className="brand">
+        <div className="brand-logo">DS</div>
+        <div className="brand-text"><span className="brand-name">DR.DE.SOUZ.AI</span><span className="brand-tag">Word Styles · Morgan Lewis Demo · v4</span></div>
+      </div>
+      <div className="stats">
+        <button onClick={()=>setMuted(!muted)} style={{background:muted?'rgba(255,68,88,0.15)':'rgba(0,206,209,0.15)',border:`1px solid ${muted?'rgba(255,68,88,0.4)':'rgba(0,206,209,0.4)'}`,color:'white',padding:'7px 12px',borderRadius:'10px',cursor:'pointer',fontSize:'13px',fontWeight:600}}>{muted?'🔇 Muted':'🔊 Audio On'}</button>
+        <div className="stat"><span className="stat-val stat-points">{points}</span><span className="stat-label">Points</span></div>
+        <div className="stat"><span className="stat-val stat-streak">🔥 {streak}</span><span className="stat-label">Streak</span></div>
+        {screen==='level' && <div className="stat"><span className="stat-val stat-level">{levelIdx+1}/{totalLevels}</span><span className="stat-label">Level</span></div>}
+      </div>
+    </div>
+  );
+}
+
+function ProgressBar({ pct }) {
+  return <div className="progress-wrap"><div className="progress-fill" style={{width:`${pct}%`}} /></div>;
+}
+
+function Welcome({ onStart }) {
+  const [aboutOpen, setAboutOpen] = useState2(true);
+  return (
+    <div className="card welcome">
+      <h1>Word Styles Microlearning</h1>
+      <p className="lead">A 5-level interactive demo built for the Morgan Lewis Technology Instructor role (R3894).</p>
+      <div className="scenario">
+        <h3>📋 Your Scenario</h3>
+        <p>You are a <strong>newly onboarded Technology Instructor at Morgan Lewis</strong>. Your first assignment: teach associates to use <strong>Word Styles</strong> to structure and professionalize a <em>Document Review Summary — Q1 2026 Internal Review, Prepared for the Client Service Committee</em>.</p>
+        <p>Each level walks one Word Styles concept through three phases: <strong>LEARN</strong> the idea, <strong>SEE</strong> the animated demo with voice narration, then <strong>PROVE</strong> it with side-by-side mini Word documents and a quick check.</p>
+        <p>Earn points, build streaks, use power-ups, and finish with a downloadable certificate (PDF + PNG).</p>
+      </div>
+      <div className="about-card">
+        <button className="about-toggle" onClick={()=>setAboutOpen(!aboutOpen)}>
+          <span>📖 About This Module</span><span className="about-chevron">{aboutOpen?'▲':'▼'}</span>
+        </button>
+        {aboutOpen && (
+          <div className="about-body">
+            <div className="about-section"><div className="about-label">What this is</div><div className="about-text">A microlearning demo built for the <strong>Morgan Lewis Technology Instructor interview</strong> (Role R3894, Washington DC, hybrid). Five levels, five Word Styles concepts, one realistic legal-document scenario.</div></div>
+            <div className="about-section"><div className="about-label">Why it was built</div><div className="about-text">To demonstrate that technology training for attorneys can be <strong>engaging, scenario-based, and immediately useful</strong> — not slide decks read aloud.</div></div>
+            <div className="about-section"><div className="about-label">What you will learn</div><div className="about-text">How to apply Word Styles — <strong>Title, Heading 1, Heading 2, Modify Style, and Generate Table of Contents</strong> — to turn a flat 11-point Aptos draft into a properly structured, navigable, professionally formatted Document Review Summary.</div></div>
+            <div className="about-section"><div className="about-label">How it is designed</div><div className="about-text">A three-phase loop per concept: <strong>LEARN</strong> (read the why), <strong>SEE</strong> (watch the animated walkthrough with synchronized voice), <strong>PROVE</strong> (compare BEFORE and AFTER and answer one applied question). Audio can be muted from the top-right toggle.</div></div>
+            <div className="about-section"><div className="about-label">Who built it</div><div className="about-text"><strong>DR.DE.SOUZ.AI</strong> — Dr. Fabiano Rodrigues De Souza, PhD. AI literacy educator and instructional designer.</div></div>
+          </div>
+        )}
+      </div>
+      <div style={{marginTop:'24px'}}><button className="btn" onClick={onStart}>Start Level 1 →</button></div>
+    </div>
+  );
+}
+
+function LevelView({ level, phase, onPhaseChange, onComplete, onNext, muted, setMuted, powerUps, setPowerUps, levelIdx, totalLevels }) {
+  return (
+    <div className="card">
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}}>
+        <h2 style={{fontSize:'21px',background:`linear-gradient(135deg, ${BRAND.teal}, ${BRAND.magenta})`,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>Level {level.id} · {level.title}</h2>
+      </div>
+      <div className="phase-tabs">
+        <button className={`phase-tab ${phase==='learn'?'active':''}`} onClick={()=>onPhaseChange('learn')}><span className="dot"></span> LEARN</button>
+        <button className={`phase-tab ${phase==='see'?'active':''}`} onClick={()=>onPhaseChange('see')}><span className="dot"></span> SEE</button>
+        <button className={`phase-tab ${phase==='prove'?'active':''}`} onClick={()=>onPhaseChange('prove')}><span className="dot"></span> PROVE</button>
+      </div>
+      {phase==='learn' && <LearnPhase level={level} onContinue={()=>onPhaseChange('see')} />}
+      {phase==='see' && <SeePhase level={level} muted={muted} setMuted={setMuted} onContinue={()=>onPhaseChange('prove')} />}
+      {phase==='prove' && <ProvePhase level={level} powerUps={powerUps} setPowerUps={setPowerUps} onCorrect={()=>onComplete(50)} onNext={onNext} isLastLevel={levelIdx===totalLevels-1} />}
+    </div>
+  );
+}
+
+function LearnPhase({ level, onContinue }) {
+  return (
+    <div>
+      <div className="concept-grid">
+        <div className="concept-card">
+          <h2>{level.title}</h2>
+          <p>{level.concept}</p>
+          <ul className="key-points">{level.keyPoints.map((kp,i)=><li key={i}>✓ {kp}</li>)}</ul>
+        </div>
+        <div><WordUI highlightStyleThumb={null} appliedStyles={{}} doc={DOC_LINES} currentLevelId={level.id} /></div>
+      </div>
+      <div className="nav-row">
+        <span style={{color:'var(--muted)',fontSize:'13px'}}>Static view of the Word interface</span>
+        <button className="btn" onClick={onContinue}>Continue to SEE phase →</button>
+      </div>
+    </div>
+  );
+}
+</script>
+<script type="text/babel">
+function SeePhase({ level, muted, setMuted, onContinue }) {
+  const [step, setStep] = useState2(-1);
+  const [cursorPos, setCursorPos] = useState2({ x: 200, y: 280 });
+  const [highlightStyleThumb, setHighlightStyleThumb] = useState2(null);
+  const [appliedStyles, setAppliedStyles] = useState2({});
+  const [selectedLine, setSelectedLine] = useState2(null);
+  const [cursorClass, setCursorClass] = useState2('');
+  const [playing, setPlaying] = useState2(false);
+  const [showCursor, setShowCursor] = useState2(false);
+  const wordRootRef = useRef2(null);
+  const synthRef = useRef2(typeof window !== 'undefined' ? window.speechSynthesis : null);
+  const voiceRef = useRef2(null);
+  const cancelRef = useRef2(false);
+
+  useEffect2(() => {
+    if (!synthRef.current) return;
+    function pick() { const voices = synthRef.current.getVoices(); voiceRef.current = pickMaleVoice(voices); }
+    pick();
+    if (synthRef.current.onvoiceschanged !== undefined) synthRef.current.onvoiceschanged = pick;
+  }, []);
+
+  function lineCoord(lineId) {
+    const container = wordRootRef.current;
+    if (!lineId || !container) return null;
+    const el = container.querySelector(`[data-line-id="${lineId}"]`);
+    if (!el) return null;
+    const cRect = container.getBoundingClientRect();
+    const eRect = el.getBoundingClientRect();
+    if (eRect.width===0 && eRect.height===0) return null;
+    return { x: eRect.left-cRect.left+28, y: eRect.top-cRect.top+eRect.height/2-14 };
+  }
+
+  function thumbCoord(thumbId) {
+    const container = wordRootRef.current;
+    if (!thumbId || !container) return null;
+    const el = container.querySelector(`[data-thumb-id="${thumbId}"]`);
+    if (!el) return null;
+    const cRect = container.getBoundingClientRect();
+    const eRect = el.getBoundingClientRect();
+    if (eRect.width===0 && eRect.height===0) return null;
+    return { x: eRect.left-cRect.left+eRect.width/2-14, y: eRect.top-cRect.top+eRect.height/2-14 };
+  }
+
+  function applyStepVisual(s) {
+    setShowCursor(true);
+    if (s===0) { setCursorPos({x:180,y:320}); setSelectedLine(null); setAppliedStyles({}); setHighlightStyleThumb(null); setCursorClass(''); }
+    else if (s===1) { const tgt=lineCoord(level.targetLineId); if(tgt) setCursorPos(tgt); setCursorClass('click'); }
+    else if (s===2) { setSelectedLine(level.targetLineId); setCursorClass(''); }
+    else if (s===3) { const tgt=thumbCoord(level.highlightStyleThumb); if(tgt) setCursorPos(tgt); setHighlightStyleThumb(level.highlightStyleThumb); }
+    else if (s===4) {
+      setCursorClass('click');
+      if (level.targetLineId && level.targetStyle) setAppliedStyles({[level.targetLineId]:level.targetStyle});
+      if (level.id===4) setAppliedStyles({'h1-bg':'style-h1-purple','h1-themes':'style-h1-purple','h1-next':'style-h1-purple'});
+    }
+    else if (s===5) { setCursorClass(''); setHighlightStyleThumb(null); }
+  }
+
+  function speakLine(text) {
+    return new Promise(resolve => {
+      if (muted || !synthRef.current || !text) { setTimeout(resolve, 1600); return; }
+      try {
+        synthRef.current.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        if (voiceRef.current) u.voice = voiceRef.current;
+        u.rate=0.95; u.pitch=0.85; u.volume=1.0; u.lang='en-US';
+        let resolved=false;
+        const finish=()=>{ if(!resolved){resolved=true;resolve();} };
+        u.onend=finish; u.onerror=finish;
+        setTimeout(finish, 4000);
+        synthRef.current.speak(u);
+      } catch(e) { setTimeout(resolve, 1600); }
+    });
+  }
+
+  async function runSequence() {
+    cancelRef.current=false; setPlaying(true);
+    for (let i=0; i<6; i++) {
+      if (cancelRef.current) break;
+      setStep(i); applyStepVisual(i);
+      await speakLine(level.narr[i]);
+    }
+    setPlaying(false);
+  }
+
+  function stopSequence() { cancelRef.current=true; if(synthRef.current) synthRef.current.cancel(); setPlaying(false); }
+  function replay() { stopSequence(); setTimeout(()=>runSequence(), 200); }
+
+  useEffect2(() => {
+    cancelRef.current=false; setStep(-1); setAppliedStyles({}); setHighlightStyleThumb(null); setSelectedLine(null);
+    setShowCursor(true); setCursorPos({x:180,y:320}); setCursorClass(''); setPlaying(false);
+    const startTimer=setTimeout(()=>{ runSequence(); }, 800);
+    return ()=>{ clearTimeout(startTimer); stopSequence(); };
+  }, [level.id]);
+
+  useEffect2(()=>{ if(muted && synthRef.current) synthRef.current.cancel(); }, [muted]);
+
+  const currentNarration = step>=0 ? level.narr[step] : 'Starting demo...';
+
+  return (
+    <div>
+      <div className="anim-controls">
+        <div className="anim-status">{playing?<span className="anim-dot"></span>:null}<span>{playing?`Step ${step+1} of 6`:'Ready'}</span></div>
+        <div className="narration-line">{currentNarration}</div>
+        <div className="anim-buttons">
+          {!playing ? <button className="anim-btn primary" onClick={runSequence}>▶ Play</button> : <button className="anim-btn" onClick={stopSequence}>⏸ Pause</button>}
+          <button className="anim-btn" onClick={replay}>↻ Replay</button>
+          <button className={`anim-btn ${muted?'muted':''}`} onClick={()=>setMuted(!muted)}>{muted?'🔇 Muted':'🔊 On'}</button>
+        </div>
+      </div>
+      <div style={{position:'relative'}}>
+        <WordUI highlightStyleThumb={highlightStyleThumb} appliedStyles={appliedStyles} selectedLine={selectedLine} doc={DOC_LINES} showCursor={showCursor} cursorPos={cursorPos} cursorClass={cursorClass} wordRootRef={wordRootRef} />
+      </div>
+      <div className="nav-row">
+        <span style={{color:'var(--muted)',fontSize:'13px'}}>Watch the demo, then continue</span>
+        <button className="btn" onClick={onContinue}>Continue to PROVE phase →</button>
+      </div>
+    </div>
+  );
+}
+</script>
+<script type="text/babel">
+function getAfterStyles(levelId) {
+  const styles = {};
+  if (levelId>=1) styles['title']='style-title';
+  const h1Class = levelId===4 ? 'style-h1-purple' : 'style-h1';
+  if (levelId>=2) { styles['h1-bg']=h1Class; styles['h1-themes']=h1Class; styles['h1-next']=h1Class; }
+  if (levelId>=3) { styles['h2-resp']='style-h2'; styles['h2-clarity']='style-h2'; styles['h2-cons']='style-h2'; }
+  return styles;
+}
+
+function ProvePhase({ level, powerUps, setPowerUps, onCorrect, onNext, isLastLevel }) {
+  const [selected, setSelected] = useState2(null);
+  const [submitted, setSubmitted] = useState2(false);
+  const [removedOptions, setRemovedOptions] = useState2([]);
+  const [showHint, setShowHint] = useState2(false);
+  const isCorrect = selected===level.quiz.correct;
+
+  function pick(i) { if (submitted||removedOptions.includes(i)) return; setSelected(i); }
+  function submit() { if (selected===null) return; setSubmitted(true); if (selected===level.quiz.correct) setTimeout(()=>onCorrect(),600); }
+  function useFifty() {
+    if (powerUps.fifty<=0||submitted) return;
+    setPowerUps({...powerUps,fifty:powerUps.fifty-1});
+    const wrongOpts=level.quiz.options.map((_,i)=>i).filter(i=>i!==level.quiz.correct);
+    setRemovedOptions(wrongOpts.sort(()=>0.5-Math.random()).slice(0,2));
+  }
+  function useHint() { if(powerUps.hint<=0||submitted) return; setPowerUps({...powerUps,hint:powerUps.hint-1}); setShowHint(true); }
+  function useSkip() { if(powerUps.skip<=0||submitted) return; setPowerUps({...powerUps,skip:powerUps.skip-1}); setSelected(level.quiz.correct); setSubmitted(true); setTimeout(()=>onCorrect(),400); }
+
+  let feedbackContent = null;
+  if (submitted) {
+    if (isCorrect) {
+      feedbackContent = <div className="quiz-feedback correct"><div className="feedback-header">✓ Excellent.</div><div className="feedback-body">{level.quiz.explanation}</div></div>;
+    } else {
+      const wf = level.quiz.wrongFeedback && level.quiz.wrongFeedback[selected];
+      feedbackContent = (
+        <div className="quiz-feedback wrong">
+          <div className="feedback-header">💡 Close — let's sharpen it.</div>
+          <div className="feedback-body">
+            {wf ? (<><div style={{marginBottom:'8px'}}>{wf.lead}</div><div dangerouslySetInnerHTML={{__html:wf.body}} /><div className="feedback-takeaway">Takeaway: {wf.takeaway}</div></>) : <div>{level.quiz.explanation}</div>}
+          </div>
+        </div>
+      );
+    }
+  }
+
+  return (
+    <div>
+      <div className="compare-grid">
+        <div className="compare-panel before">
+          <div className="compare-label before">Before</div>
+          <div className="compare-word-wrap"><WordUI compact={true} doc={DOC_LINES} appliedStyles={{}} showCursor={false} /></div>
+        </div>
+        <div className="compare-divider"></div>
+        <div className="compare-mobile-arrow">↓</div>
+        <div className="compare-panel after">
+          <div className="compare-label after">After</div>
+          <div className="compare-word-wrap"><WordUI compact={true} doc={DOC_LINES} appliedStyles={getAfterStyles(level.id)} showCursor={false} showTOC={level.id===5} /></div>
+        </div>
+      </div>
+      <div className="powerups">
+        <button className="pu-btn" onClick={useFifty} disabled={powerUps.fifty<=0||submitted}>50/50 <span className="pu-count">{powerUps.fifty}</span></button>
+        <button className="pu-btn" onClick={useHint} disabled={powerUps.hint<=0||submitted}>💡 Hint <span className="pu-count">{powerUps.hint}</span></button>
+        <button className="pu-btn" onClick={useSkip} disabled={powerUps.skip<=0||submitted}>⏩ Skip <span className="pu-count">{powerUps.skip}</span></button>
+      </div>
+      <div className="quiz">
+        <div className="quiz-q">{level.quiz.q}</div>
+        {showHint && <div style={{padding:'10px 14px',marginBottom:'14px',background:'rgba(255,215,0,0.08)',borderLeft:'3px solid #FFD700',borderRadius:'6px',fontSize:'13px',color:'var(--text)'}}>💡 Hint: think about what saves the most clicks across the whole document.</div>}
+        <div className="quiz-options">
+          {level.quiz.options.map((opt,i)=>{
+            const removed=removedOptions.includes(i);
+            let cls='quiz-opt';
+            if (removed) cls+=' disabled';
+            else if (submitted&&i===level.quiz.correct) cls+=' correct';
+            else if (submitted&&i===selected&&i!==level.quiz.correct) cls+=' wrong';
+            else if (selected===i) cls+=' selected';
+            return <button key={i} className={cls} onClick={()=>pick(i)} disabled={removed||submitted}>{String.fromCharCode(65+i)}. {removed?'— eliminated —':opt}</button>;
+          })}
+        </div>
+        {feedbackContent}
+        <div className="nav-row">
+          {!submitted ? (
+            <><span style={{color:'var(--muted)',fontSize:'13px'}}>Pick an answer to lock in</span><button className="btn" onClick={submit} disabled={selected===null}>Submit Answer</button></>
+          ) : isCorrect ? (
+            <><span style={{color:'var(--teal)',fontSize:'14px',fontWeight:600}}>+50 points · Streak +1</span><button className="btn" onClick={onNext}>{isLastLevel?'Final Quiz →':'Next Level →'}</button></>
+          ) : (
+            <><span style={{color:'#FFC107',fontSize:'13px'}}>Read the takeaway, then keep going</span><button className="btn secondary" onClick={onNext}>Continue →</button></>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+</script>
+<script type="text/babel">
+function WordUI({ highlightStyleThumb, appliedStyles={}, selectedLine, doc, showCursor, cursorPos, cursorClass, compact=false, showTOC=false, wordRootRef, currentLevelId=1 }) {
+  const heroStyle = currentLevelId===1?'title':currentLevelId===2?'h1':currentLevelId===3?'h2':currentLevelId===4?'h1':'normal';
+  const galleryThumbs = [
+    {id:'title',kind:'title'},{id:'h1',kind:'h1'},{id:'h2',kind:'h2'},
+    {id:'normal',kind:'normal'},{id:'nospacing',kind:'normal'},{id:'subtitle',kind:'normal'},{id:'strong',kind:'normal'}
+  ];
+  galleryThumbs.sort((a,b)=>{ if(a.id===heroStyle) return -1; if(b.id===heroStyle) return 1; return 0; });
+
+  function renderThumb(t) {
+    const isHero=t.id===heroStyle;
+    const isHighlight=highlightStyleThumb===t.id;
+    const baseClass=`style-thumb ${t.kind}-thumb ${isHero?'hero':''} ${isHighlight?'highlight':''}`;
+    if (t.id==='title') return <div key={t.id} className={baseClass} data-thumb-id="title"><div className="style-preview-title">Title</div><div className="style-name">Title</div></div>;
+    if (t.id==='h1') return <div key={t.id} className={baseClass} data-thumb-id="h1"><div className="style-preview">AaBbCc<br/>Heading 1</div></div>;
+    if (t.id==='h2') return <div key={t.id} className={baseClass} data-thumb-id="h2"><div className="style-preview">AaBbCcD<br/>Heading 2</div></div>;
+    if (t.id==='normal') return <div key={t.id} className={baseClass} data-thumb-id="normal"><div className="style-preview">AaBbCcDdE<br/>Normal</div></div>;
+    if (t.id==='nospacing') return <div key={t.id} className={baseClass} data-thumb-id="nospacing"><div className="style-preview">AaBbCcDdE<br/>No Spacing</div></div>;
+    if (t.id==='subtitle') return <div key={t.id} className={baseClass} data-thumb-id="subtitle"><div className="style-preview" style={{fontStyle:'italic',color:'#666',fontSize:'9px',letterSpacing:'0.5px'}}>SUBTITLE</div></div>;
+    if (t.id==='strong') return <div key={t.id} className={`${baseClass} extra-thumb`} data-thumb-id="strong"><div className="style-preview" style={{fontWeight:700}}>Strong</div></div>;
+    return null;
+  }
+
+  return (
+    <div className={`word-app ${compact?'compact':''}`} ref={wordRootRef}>
+      {showCursor && cursorPos && (
+        <div className={`word-cursor ${cursorClass||''}`} style={{left:cursorPos.x,top:cursorPos.y}}>
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 2 L3 18 L7 14 L10 22 L13 21 L10 13 L17 13 Z" fill="white" stroke="black" strokeWidth="1.2" /></svg>
+        </div>
+      )}
+      <div className="word-titlebar">
+        <div className="word-titlebar-left">
+          <div className="word-quick"><div className="qa-btn">💾</div><div className="qa-btn">↶</div><div className="qa-btn">↷</div></div>
+          <div className="word-autosave"><span className="autosave-pill"><span className="autosave-dot"></span>AutoSave</span><span className="autosave-toggle">●━</span></div>
+          <span className="word-title-text">Document Review Summary - DRAFT - Word</span>
+        </div>
+        <div className="word-search"><span className="search-icon">🔍</span><span className="search-text">Search (Alt+Q)</span></div>
+        <div className="word-titlebar-right">
+          <span className="word-comments">💬 Comments</span><span className="word-share">↗ Share</span>
+          <div className="word-window-controls"><div className="word-wc">_</div><div className="word-wc">▢</div><div className="word-wc close">✕</div></div>
+        </div>
+      </div>
+      <div className="word-menubar">
+        <span className="word-menu">File</span><span className="word-menu active">Home</span><span className="word-menu">Insert</span><span className="word-menu">Draw</span><span className="word-menu">Design</span><span className="word-menu">Layout</span><span className="word-menu">References</span><span className="word-menu">Mailings</span><span className="word-menu">Review</span><span className="word-menu">View</span><span className="word-menu">Help</span>
+      </div>
+      <div className="word-ribbon">
+        <div className="ribbon-group" style={{minWidth:'52px'}}>
+          <div className="ribbon-group-content"><button className="ribbon-btn large"><span className="icon">📋</span><span style={{fontSize:'8px'}}>Paste</span></button></div>
+          <div className="ribbon-group-label">Clipboard</div>
+        </div>
+        <div className="ribbon-group" style={{minWidth:'140px'}}>
+          <div className="ribbon-group-content">
+            <div className="font-controls">
+              <div className="font-row"><div className="font-name">Aptos (Body) <span>▾</span></div><div className="font-size">11 ▾</div></div>
+              <div className="font-row"><button className="ribbon-btn B">B</button><button className="ribbon-btn I">I</button><button className="ribbon-btn U">U</button><button className="ribbon-btn" style={{textDecoration:'line-through'}}>abc</button><button className="ribbon-btn"><span style={{color:BRAND.wordBlue}}>A</span></button></div>
+            </div>
+          </div>
+          <div className="ribbon-group-label">Font</div>
+        </div>
+        <div className="ribbon-group" style={{minWidth:'60px'}}>
+          <div className="ribbon-group-content">
+            <div className="font-controls">
+              <div className="font-row"><button className="ribbon-btn">≡</button><button className="ribbon-btn">≡</button><button className="ribbon-btn">≡</button></div>
+              <div className="font-row"><button className="ribbon-btn">•</button><button className="ribbon-btn">1.</button></div>
+            </div>
+          </div>
+          <div className="ribbon-group-label">Paragraph</div>
+        </div>
+        <div className="ribbon-group" style={{flex:1,minWidth:'480px'}}>
+          <div className="ribbon-group-content">
+            <div className="styles-gallery">
+              {galleryThumbs.map(renderThumb)}
+              <div className="styles-expand"><span className="arrow">▲</span><span className="arrow">▼</span><span className="arrow">⤓</span></div>
+            </div>
+          </div>
+          <div className="ribbon-group-label">Styles</div>
+        </div>
+      </div>
+      <div className="word-styles-actions">
+        <span className="action-link"><span className="action-icon">A+</span>Create a Style</span>
+        <span className="action-link"><span className="action-icon">A∅</span>Clear Formatting</span>
+        <span className="action-link"><span className="action-icon">A↓</span>Apply Styles...</span>
+      </div>
+      <div className="word-doc-area">
+        <div className="word-page">
+          {doc.map(line=>{
+            const styleClass=appliedStyles[line.id]||'';
+            const selClass=selectedLine===line.id?'selected':'';
+            return <div key={line.id} data-line-id={line.id} className={`doc-line ${styleClass} ${selClass}`}>{line.text}</div>;
+          })}
+          {showTOC && (
+            <div style={{marginTop:'14px',padding:'10px 12px',border:'1px solid #ccc',background:'#f9f9f9',borderRadius:'4px'}}>
+              <div style={{fontWeight:700,fontSize:'11pt',marginBottom:'6px',color:'#1a1a1a'}}>Table of Contents</div>
+              <div style={{fontSize:'10pt',color:'#1a1a1a',lineHeight:1.6}}>Background ............................ 1</div>
+              <div style={{fontSize:'10pt',color:'#1a1a1a',lineHeight:1.6}}>Key Themes ............................ 2</div>
+              <div style={{fontSize:'10pt',color:'#1a1a1a',paddingLeft:'14px',lineHeight:1.6}}>Responsiveness ..................... 2</div>
+              <div style={{fontSize:'10pt',color:'#1a1a1a',paddingLeft:'14px',lineHeight:1.6}}>Clarity ............................ 3</div>
+              <div style={{fontSize:'10pt',color:'#1a1a1a',paddingLeft:'14px',lineHeight:1.6}}>Consistency ........................ 3</div>
+              <div style={{fontSize:'10pt',color:'#1a1a1a',lineHeight:1.6}}>Recommended Next Steps ................ 4</div>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="word-statusbar">
+        <span>Page 1 of 2 · 159 of 159 words · English (United States)</span>
+        <span>📖 ▦ 100% — ● +</span>
+      </div>
+    </div>
+  );
+}
+</script>
+<script type="text/babel">
+function FinalQuiz({ qIdx, setQIdx, correct, setCorrect, answered, setAnswered, onComplete, addPoints }) {
+  const finalQs = LEVELS.map(l=>({...l.final, levelTitle:l.title}));
+  const q = finalQs[qIdx];
+  const isLast = qIdx===finalQs.length-1;
+
+  function pick(i) { if(answered!==null) return; setAnswered(i); if(i===q.correct){setCorrect(c=>c+1);addPoints(30);} }
+  function next() { if(isLast) onComplete(); else { setQIdx(qIdx+1); setAnswered(null); } }
+
+  return (
+    <div className="card">
+      <div className="final-q-counter">Final Cumulative Quiz · Question {qIdx+1} of {finalQs.length}</div>
+      <h2 style={{fontSize:'20px',marginBottom:'8px',background:`linear-gradient(135deg, ${BRAND.teal}, ${BRAND.magenta})`,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>Concept review: {q.levelTitle}</h2>
+      <div className="quiz">
+        <div className="quiz-q">{q.q}</div>
+        <div className="quiz-options">
+          {q.options.map((opt,i)=>{
+            let cls='quiz-opt';
+            if (answered!==null&&i===q.correct) cls+=' correct';
+            else if (answered===i&&i!==q.correct) cls+=' wrong';
+            return <button key={i} className={cls} onClick={()=>pick(i)} disabled={answered!==null}>{String.fromCharCode(65+i)}. {opt}</button>;
+          })}
+        </div>
+        {answered!==null && (
+          <div className={`quiz-feedback ${answered===q.correct?'correct':'wrong'}`}>
+            <div className="feedback-header">{answered===q.correct?'✓ Correct.':'💡 Reviewing this concept will help.'}</div>
+            <div className="feedback-body">{answered===q.correct?'+30 points. Strong recall.':`The strongest answer is "${q.options[q.correct]}". Reviewing the LEARN content for this level will reinforce the why.`}</div>
+          </div>
+        )}
+        <div className="nav-row">
+          <span style={{color:'var(--muted)',fontSize:'13px'}}>Score: {correct}/{qIdx+(answered!==null?1:0)}</span>
+          <button className="btn" onClick={next} disabled={answered===null}>{isLast?'See Certificate →':'Next Question →'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Certificate({ points, finalCorrect, recipientName, setRecipientName, onRestart }) {
+  const canvasRef = useRef2(null);
+  useEffect2(()=>{ drawCert(); }, [recipientName, points, finalCorrect]);
+
+  function drawCert() {
+    const canvas=canvasRef.current; if(!canvas) return;
+    const W=1100, H=760; canvas.width=W; canvas.height=H;
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+    const grad=ctx.createLinearGradient(0,0,W,H);
+    grad.addColorStop(0,BRAND.teal); grad.addColorStop(0.5,BRAND.purple); grad.addColorStop(1,BRAND.magenta);
+    ctx.strokeStyle=grad; ctx.lineWidth=12; ctx.strokeRect(20,20,W-40,H-40);
+    ctx.strokeStyle='#cccccc'; ctx.lineWidth=1; ctx.strokeRect(50,50,W-100,H-100);
+    ctx.fillStyle=grad; ctx.fillRect(W/2-40,90,80,80);
+    ctx.fillStyle='white'; ctx.font='bold 28px sans-serif'; ctx.textAlign='center'; ctx.fillText('DS',W/2,138);
+    ctx.fillStyle='#333'; ctx.font='bold 20px sans-serif'; ctx.fillText('DR.DE.SOUZ.AI',W/2,200);
+    ctx.font='13px sans-serif'; ctx.fillStyle='#888'; ctx.fillText('AI Literacy · Letramento em IA',W/2,222);
+    ctx.fillStyle=BRAND.purple; ctx.font='bold 44px serif'; ctx.fillText('Certificate of Completion',W/2,290);
+    ctx.fillStyle='#555'; ctx.font='16px sans-serif'; ctx.fillText('This certifies that',W/2,340);
+    ctx.fillStyle='#1a1a1a'; ctx.font='bold italic 38px serif'; ctx.fillText(recipientName||'Morgan Lewis Attendee',W/2,400);
+    const nameWidth=ctx.measureText(recipientName||'Morgan Lewis Attendee').width;
+    ctx.strokeStyle=BRAND.teal; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(W/2-nameWidth/2-20,415); ctx.lineTo(W/2+nameWidth/2+20,415); ctx.stroke();
+    ctx.fillStyle='#333'; ctx.font='17px sans-serif'; ctx.fillText('has successfully completed the',W/2,450);
+    ctx.fillStyle=BRAND.magenta; ctx.font='bold 24px sans-serif'; ctx.fillText('Word Styles Microlearning Module',W/2,485);
+    ctx.fillStyle='#555'; ctx.font='15px sans-serif'; ctx.fillText('Morgan Lewis Technology Instructor Demo · 5 Levels · Final Quiz',W/2,512);
+    ctx.fillStyle='#1a1a1a'; ctx.font='bold 16px sans-serif'; ctx.fillText(`Points Earned: ${points}   ·   Final Quiz: ${finalCorrect}/5`,W/2,565);
+    const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    ctx.fillStyle='#666'; ctx.font='14px sans-serif'; ctx.textAlign='left'; ctx.fillText('Date',180,660);
+    ctx.fillStyle='#1a1a1a'; ctx.fillText(today,180,685);
+    ctx.strokeStyle='#aaa'; ctx.beginPath(); ctx.moveTo(180,670); ctx.lineTo(380,670); ctx.stroke();
+    ctx.fillStyle='#666'; ctx.fillText('Instructor',W-380,660);
+    ctx.fillStyle='#1a1a1a'; ctx.font='italic 16px serif'; ctx.fillText('Dr. De SouzAI',W-380,685);
+    ctx.strokeStyle='#aaa'; ctx.beginPath(); ctx.moveTo(W-380,670); ctx.lineTo(W-180,670); ctx.stroke();
+    ctx.fillStyle='#888'; ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.fillText('mrdesouzaphd-cmyk.github.io/word-styles-microlearning-v2 · Built with React',W/2,720);
+  }
+
+  function downloadPNG() {
+    const link=document.createElement('a');
+    link.download=`Word-Styles-Certificate-${(recipientName||'Attendee').replace(/\s/g,'-')}.png`;
+    link.href=canvasRef.current.toDataURL('image/png'); link.click();
+  }
+  function downloadPDF() {
+    const imgData=canvasRef.current.toDataURL('image/png');
+    const { jsPDF }=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'pt',format:[1100,760]});
+    pdf.addImage(imgData,'PNG',0,0,1100,760);
+    pdf.save(`Word-Styles-Certificate-${(recipientName||'Attendee').replace(/\s/g,'-')}.pdf`);
+  }
+
+  return (
+    <div className="card cert-wrap">
+      <h1 style={{fontSize:'34px',marginBottom:'10px',background:`linear-gradient(135deg, ${BRAND.teal}, ${BRAND.magenta})`,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>🎓 Module Complete!</h1>
+      <p style={{color:'var(--muted)',marginBottom:'18px'}}>Final score: <strong style={{color:'var(--teal)'}}>{points} points</strong> · Quiz: <strong style={{color:'var(--magenta)'}}>{finalCorrect}/5</strong></p>
+      <input className="cert-input" type="text" placeholder="Type your name to personalize the certificate" value={recipientName} onChange={(e)=>setRecipientName(e.target.value)} />
+      <div className="cert-canvas-wrap"><canvas ref={canvasRef} /></div>
+      <div className="cert-buttons">
+        <button className="btn" onClick={downloadPDF}>📄 Download PDF</button>
+        <button className="btn" onClick={downloadPNG}>🖼️ Download PNG</button>
+        <button className="btn secondary" onClick={onRestart}>↻ Restart Module</button>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
